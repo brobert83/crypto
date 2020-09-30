@@ -34,3 +34,6 @@
      quantity                             |     
      price                                |     ...
 ```
+---
+- Implemented the order place logic
+- Used TreeSet to maintain the order and perform easy search

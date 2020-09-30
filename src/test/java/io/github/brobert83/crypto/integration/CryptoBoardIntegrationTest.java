@@ -62,30 +62,30 @@ public class CryptoBoardIntegrationTest {
         assertThat(boardSummary.getSellOrders().get(new Symbol("ETHEREUM")))
                 .isNotNull()
                 .containsExactly(
-                        OrderSummary.builder().quantity(new BigDecimal("353.6")).price(new BigDecimal("13.6")).build(),
-                        OrderSummary.builder().quantity(new BigDecimal("441.8")).price(new BigDecimal("13.9")).build(),
-                        OrderSummary.builder().quantity(new BigDecimal("50.5")).price(new BigDecimal("14")).build()
+                        Level.builder().quantity(new BigDecimal("353.6")).price(new BigDecimal("13.6")).build(),
+                        Level.builder().quantity(new BigDecimal("441.8")).price(new BigDecimal("13.9")).build(),
+                        Level.builder().quantity(new BigDecimal("50.5")).price(new BigDecimal("14")).build()
                 );
 
         assertThat(boardSummary.getBuyOrders().get(new Symbol("Ethereum")))
                 .isNotNull()
                 .containsExactly(
-                        OrderSummary.builder().quantity(new BigDecimal("111.5")).price(new BigDecimal("15.8")).build(),
-                        OrderSummary.builder().quantity(new BigDecimal("23")).price(new BigDecimal("14.1")).build()
+                        Level.builder().quantity(new BigDecimal("111.5")).price(new BigDecimal("15.8")).build(),
+                        Level.builder().quantity(new BigDecimal("23")).price(new BigDecimal("14.1")).build()
                 );
 
         assertThat(boardSummary.getSellOrders().get(new Symbol("litecoin")))
                 .isNotNull()
                 .containsExactly(
-                        OrderSummary.builder().quantity(new BigDecimal("45.56245")).price(new BigDecimal("111.6")).build(),
-                        OrderSummary.builder().quantity(new BigDecimal("567.3234")).price(new BigDecimal("123.567")).build()
+                        Level.builder().quantity(new BigDecimal("45.56245")).price(new BigDecimal("111.6")).build(),
+                        Level.builder().quantity(new BigDecimal("567.3234")).price(new BigDecimal("123.567")).build()
                 );
 
         assertThat(boardSummary.getBuyOrders().get(new Symbol("Litecoin")))
                 .isNotNull()
                 .containsExactly(
-                        OrderSummary.builder().quantity(new BigDecimal("10.22")).price(new BigDecimal("44.7")).build(),
-                        OrderSummary.builder().quantity(new BigDecimal("55.67")).price(new BigDecimal("44.1")).build()
+                        Level.builder().quantity(new BigDecimal("10.22")).price(new BigDecimal("44.7")).build(),
+                        Level.builder().quantity(new BigDecimal("55.67")).price(new BigDecimal("44.1")).build()
                 );
     }
 

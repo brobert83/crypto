@@ -10,8 +10,8 @@ import java.util.Map;
 @Builder
 public class BoardSummary {
 
-    @Getter private final Map<Symbol, List<OrderSummary>> sellOrders = new HashMap<>();
-    @Getter private final Map<Symbol, List<OrderSummary>> buyOrders = new HashMap<>();
+    @Getter private final Map<Symbol, List<Level>> sellOrders = new HashMap<>();
+    @Getter private final Map<Symbol, List<Level>> buyOrders = new HashMap<>();
 
     private Side side;
 
