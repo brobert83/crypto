@@ -51,8 +51,6 @@ public class CryptoBoardIntegrationTest {
                 //buy litecoin
                 Order.builder().side(Side.BUY).symbol(litecoin).quantity(new BigDecimal("55.67")).price(new BigDecimal("44.1")).build(),
                 Order.builder().side(Side.BUY).symbol(litecoin).quantity(new BigDecimal("10.22")).price(new BigDecimal("44.7")).build()
-
-
         ).forEach(cryptoBoard::placeOrder);
 
         long orderId_toBeRemoved = cryptoBoard.placeOrder(Order.builder().side(Side.SELL).symbol(ethereum).quantity(new BigDecimal("3.5")).price(new BigDecimal("13.6")).build());
@@ -119,6 +117,7 @@ public class CryptoBoardIntegrationTest {
         }
     }
 
+    // This test will build a board in single threaded mode than a second board  multi-threaded and compare them
     @Test
     public void summaryThreadSafe() throws InterruptedException {
 
@@ -144,16 +143,21 @@ public class CryptoBoardIntegrationTest {
                 .price(randomPrice.get())
                 .build();
 
-        List<Runnable> commands = IntStream.rangeClosed(1, 1000)
-                .peek(index -> cryptoBoard.placeOrder(orderBuilder.apply(index)))
-                .mapToObj(index -> (Runnable) () -> threadedCallBoard.placeOrder(orderBuilder.apply(index)))
+        // these are the orders used to build both books
+        List<Order> orders = IntStream.rangeClosed(1, 1000)
+                .mapToObj(orderBuilder::apply)
+                .collect(Collectors.toList());
+
+        List<Runnable> commands = orders.stream()
+                .peek(order -> cryptoBoard.placeOrder(order))
+                .map(order -> (Runnable) () -> threadedCallBoard.placeOrder(order))
                 .collect(Collectors.toList());
 
         ExecutorService executorService = Executors.newFixedThreadPool(15);
 
         commands.parallelStream().forEach(executorService::submit);
         executorService.shutdown();
-        executorService.awaitTermination(0, TimeUnit.SECONDS);
+        executorService.awaitTermination(100, TimeUnit.SECONDS);
 
         BoardSummary boardSummary = cryptoBoard.getBoardSummary();
         BoardSummary threadedBoard_Summary = threadedCallBoard.getBoardSummary();
@@ -161,11 +165,13 @@ public class CryptoBoardIntegrationTest {
         threadedBoard_Summary.getBuyOrders()
                 .forEach((symbol, levels) ->
                         assertThat(levels)
+                                .describedAs("buy orders for " + symbol)
                                 .containsExactly(boardSummary.getBuyOrders().get(symbol).toArray(new Level[0])));
 
         threadedBoard_Summary.getSellOrders()
                 .forEach((symbol, levels) ->
                         assertThat(levels)
+                                .describedAs("sell orders for " + symbol)
                                 .containsExactly(boardSummary.getSellOrders().get(symbol).toArray(new Level[0])));
     }
 

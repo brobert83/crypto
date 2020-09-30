@@ -26,6 +26,9 @@ public class OrderBooksTest {
         //then
         assertThat(orderBook).isNotNull();
         assertThat(orderBooks.getOrderBookForSymbol(symbol)).isEqualTo(orderBook);
+        assertThat(orderBook.getBuyExecutor()).isNotNull();
+        assertThat(orderBook.getSellExecutor()).isNotNull();
+        assertThat(orderBook.getSellExecutor()).isNotSameAs(orderBook.getBuyExecutor());
     }
 
     @Test

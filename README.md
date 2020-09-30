@@ -65,3 +65,11 @@
      .     |                             |   .
    sell x -|                             |- buy x                                            
 ```
+---
+- Implemented threaded support, made the integration test **PASS** 
+- At this point the code fulfils order operations functional requirements
+- Tomorrow I will :
+  - Look and see if there are any refactorings that I can make to make it better
+  - Look at how a client will use it 
+  - Look at how to make it easy to use plus document the usage
+  - Look at possible performance improvements
