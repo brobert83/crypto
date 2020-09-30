@@ -7,7 +7,7 @@
 - AssertJ and Mockito will be used for testing
 - The example in the spec for the summary is only for one symbol, but my decision is to make it so that the summary will contain data about all the symbols and both sell and buy sides.
 - The first version will be single threaded, after that works I will add multi-threading.
-- I won't make too many performace enhacements initially, the first version will focus on the functional requirements.
+- I won't make too many performance enhancements initially, the first version will focus on the functional requirements.
 
 ## Commit details
 
@@ -18,3 +18,19 @@
  - Added README
 ---
  - Enhanced the integration test with BUY orders and a second symbol
+--- 
+ - Started to build the order placement logic
+ - My idea is to maintain a structure like this:             
+```
+   OrderBooks                             |
+     Map<Symbol, OrderBook> orderBooks    |     The data structure will be like this 
+                                          |      
+   OrderBook                              |
+     Symbol symbol                        |     Ethereum  ->  sellLevels(quantity, price)  
+     Collection<Level> sellLevels         |                   buyLevels(quantity, price)  
+     Collection<Level> buyLevels          |                              
+                                          |     Litecoin  -> sellLevels(quantity, price)  
+   Level                                  |                  buyLevels(quantity, price)   
+     quantity                             |     
+     price                                |     ...
+```
