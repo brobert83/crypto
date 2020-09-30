@@ -41,3 +41,5 @@
 - Added the board summary logic, made the integration test **PASS**
 ---
 - Enhanced the integration test with a order removal
+---
+- Implemented order removal logic, made the integration test **PASS**

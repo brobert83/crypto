@@ -2,6 +2,7 @@ package io.github.brobert83.crypto.integration;
 
 import io.github.brobert83.crypto.CryptoBoard;
 import io.github.brobert83.crypto.OrderBooks;
+import io.github.brobert83.crypto.OrdersIndex;
 import io.github.brobert83.crypto.model.*;
 import org.junit.Test;
 
@@ -12,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class CryptoBoardIntegrationTest {
 
-    CryptoBoard cryptoBoard = new CryptoBoard(new OrderBooks());
+    CryptoBoard cryptoBoard = new CryptoBoard(new OrderBooks(), new OrdersIndex());
 
     @Test
     public void summary() {

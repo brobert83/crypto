@@ -31,11 +31,11 @@ public class OrderBookTest {
 
     @Before
     public void setUp() {
-       orderBook = OrderBook.builder().symbol(symbol).build();
+        orderBook = OrderBook.builder().symbol(symbol).build();
     }
 
     @Test
-    public void addOrder_uuid(){
+    public void addOrder_uuid() {
 
         //given
         when(order.getPrice()).thenReturn(BigDecimal.ZERO);
@@ -48,21 +48,22 @@ public class OrderBookTest {
         //then
         verify(order).setId(anyLong());
         assertThat(orderId).isEqualTo(1234L);
+        assertThat(orderBook.getOrders()).containsValue(order);
     }
 
     @Test
-    public void add_Order_nulls(){
+    public void add_Order_nulls() {
 
         //noinspection ConstantConditions
-        assertThatThrownBy(() ->  orderBook.addOrder(null))
+        assertThatThrownBy(() -> orderBook.addOrder(null))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("order is marked non-null but is null");
 
-        assertThatThrownBy(() ->  orderBook.addOrder(Order.builder().quantity(BigDecimal.ZERO).build()))
+        assertThatThrownBy(() -> orderBook.addOrder(Order.builder().quantity(BigDecimal.ZERO).build()))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Order price is null");
 
-        assertThatThrownBy(() ->  orderBook.addOrder(Order.builder().price(BigDecimal.ZERO).build()))
+        assertThatThrownBy(() -> orderBook.addOrder(Order.builder().price(BigDecimal.ZERO).build()))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Order quantity is null");
     }
@@ -102,6 +103,50 @@ public class OrderBookTest {
                         Level.builder().quantity(new BigDecimal("111.5")).price(new BigDecimal("15.8")).build(),
                         Level.builder().quantity(new BigDecimal("23.0")).price(new BigDecimal("14.1")).build()
                 );
+    }
+
+    @Test
+    public void removeOrder() {
+
+        //given
+        List<Order> orders = Arrays.asList(
+                Order.builder().side(Side.SELL).quantity(new BigDecimal("350.1")).price(new BigDecimal("13.6")).build(),
+                Order.builder().side(Side.SELL).quantity(new BigDecimal("50.5")).price(new BigDecimal("14")).build(),
+                Order.builder().side(Side.SELL).quantity(new BigDecimal("441.8")).price(new BigDecimal("13.9")).build(),
+
+                Order.builder().side(Side.BUY).quantity(new BigDecimal("10.5")).price(new BigDecimal("14.1")).build()
+
+        );
+
+        orders.forEach(orderBook::addOrder);
+        long orderId1_toRemove = orderBook.addOrder(Order.builder().side(Side.SELL).quantity(new BigDecimal("3.5")).price(new BigDecimal("13.6")).build());
+        long orderId2_toRemove = orderBook.addOrder(Order.builder().side(Side.BUY).quantity(new BigDecimal("12.5")).price(new BigDecimal("14.1")).build());
+        long orderId3_toRemove = orderBook.addOrder(Order.builder().side(Side.BUY).quantity(new BigDecimal("111.5")).price(new BigDecimal("15.8")).build());
+
+        //when
+        orderBook.removeOrder(orderId1_toRemove);
+        orderBook.removeOrder(orderId2_toRemove);
+        orderBook.removeOrder(orderId3_toRemove);
+
+        TreeSet<Level> sellLevels = orderBook.getSellLevels();
+        TreeSet<Level> buyLevels = orderBook.getBuyLevels();
+
+        //then
+        assertThat(sellLevels)
+                .isNotNull()
+                .containsExactly(
+                        Level.builder().quantity(new BigDecimal("350.1")).price(new BigDecimal("13.6")).build(),
+                        Level.builder().quantity(new BigDecimal("441.8")).price(new BigDecimal("13.9")).build(),
+                        Level.builder().quantity(new BigDecimal("50.5")).price(new BigDecimal("14")).build()
+                );
+
+        assertThat(buyLevels)
+                .isNotNull()
+                .containsExactly(
+                        Level.builder().quantity(new BigDecimal("10.5")).price(new BigDecimal("14.1")).build()
+                );
+
+        assertThat(orderBook.getOrders()).doesNotContainKeys(orderId1_toRemove, orderId2_toRemove, orderId3_toRemove);
     }
 
 }

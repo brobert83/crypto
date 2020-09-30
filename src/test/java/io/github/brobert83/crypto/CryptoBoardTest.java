@@ -24,14 +24,15 @@ public class CryptoBoardTest {
     @Mock OrderBook orderBook;
     @Mock Symbol symbol;
     @Mock BoardSummary boardSummary;
+    @Mock OrdersIndex ordersIndex;
 
     @Before
     public void setUp() {
-        cryptoBoard = new CryptoBoard(orderBooks);
+        cryptoBoard = new CryptoBoard(orderBooks, ordersIndex);
     }
 
     @Test
-    public void placeOrder(){
+    public void placeOrder() {
 
         //given
         Order order = Mockito.mock(Order.class);
@@ -44,11 +45,12 @@ public class CryptoBoardTest {
 
         //then
         assertThat(orderId).isEqualTo(1234L);
+        verify(ordersIndex).add(1234L, orderBook);
         verify(orderBook).addOrder(order);
     }
 
     @Test
-    public void getBoardSummary(){
+    public void getBoardSummary() {
 
         //given
         when(orderBooks.getBoardSummary()).thenReturn(boardSummary);
@@ -58,6 +60,20 @@ public class CryptoBoardTest {
 
         //then
         assertThat(actualBoardSummary).isEqualTo(boardSummary);
+    }
+
+
+    @Test
+    public void removeOrder() {
+
+        //given
+        when(ordersIndex.getOrderBook(12L)).thenReturn(orderBook);
+
+        //when
+        cryptoBoard.removeOrder(12L);
+
+        //then
+        verify(orderBook).removeOrder(12L);
     }
 
 }
