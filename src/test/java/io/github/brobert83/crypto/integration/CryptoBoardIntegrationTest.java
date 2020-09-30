@@ -7,6 +7,15 @@ import io.github.brobert83.crypto.model.*;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -108,6 +117,44 @@ public class CryptoBoardIntegrationTest {
                     );
 
         }
+    }
+
+    @Test
+    public void summaryThreadSafe() throws InterruptedException {
+
+        //given
+        Symbol ethereum = new Symbol("Ethereum");
+        Symbol litecoin = new Symbol("Litecoin");
+
+        Random random = new Random();
+
+        Supplier<Side> randomSide = () -> random.nextInt(2) % 2 == 0 ? Side.SELL : Side.BUY;
+        Supplier<Symbol> randomSymbol = () -> random.nextInt(2) % 2 == 0 ? ethereum : litecoin;
+
+        CryptoBoard threadedCallBoard = new CryptoBoard(new OrderBooks(), new OrdersIndex());
+
+        Function<Integer, Order> orderBuilder = index -> Order.builder()
+                .side(randomSide.get())
+                .symbol(randomSymbol.get())
+                .quantity(BigDecimal.valueOf(Math.random()).add(BigDecimal.ONE))
+                .price(BigDecimal.valueOf(Math.random()).add(BigDecimal.ONE))
+                .build();
+
+        List<Runnable> commands = IntStream.rangeClosed(1, 1000)
+                .peek(index -> cryptoBoard.placeOrder(orderBuilder.apply(index)))
+                .mapToObj(index -> (Runnable) () -> threadedCallBoard.placeOrder(orderBuilder.apply(index)))
+                .collect(Collectors.toList());
+
+        ExecutorService executorService = Executors.newFixedThreadPool(15);
+
+        commands.parallelStream().forEach(executorService::submit);
+        executorService.shutdown();
+        executorService.awaitTermination(0, TimeUnit.SECONDS);
+
+        BoardSummary boardSummary = cryptoBoard.getBoardSummary();
+        BoardSummary threadedBoard_Summary = threadedCallBoard.getBoardSummary();
+
+        assertThat(threadedBoard_Summary).isEqualToComparingFieldByField(boardSummary);
     }
 
 }

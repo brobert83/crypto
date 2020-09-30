@@ -43,3 +43,5 @@
 - Enhanced the integration test with a order removal
 ---
 - Implemented order removal logic, made the integration test **PASS**
+---
+- Added integration test for threaded calls
