@@ -1,6 +1,6 @@
 ### General notes
 
-- The specification is [here](docs/Crypto_v.1.0.md).
+- The specification is [here](docs/Crypto_v1.0.md).
 - Java 8 will be used
 - The solution will be written using a ATDD approach.
 - Lombok will be used to reduce boilerplate code.
@@ -16,3 +16,5 @@
 ---  
  - Created a integration test with the data in the spec with no implementation apart from empty methods and things to make it compile in general
  - Added README
+---
+ - Enhanced the integration test with BUY orders and a second symbol
