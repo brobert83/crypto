@@ -22,4 +22,8 @@ public class CryptoBoard {
         return orderBooks.getBoardSummary();
     }
 
+    public void removeOrder(long orderId) {
+
+    }
+
 }

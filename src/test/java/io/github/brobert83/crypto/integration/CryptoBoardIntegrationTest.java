@@ -26,7 +26,7 @@ public class CryptoBoardIntegrationTest {
                 Order.builder().side(Side.SELL).symbol(ethereum).quantity(new BigDecimal("350.1")).price(new BigDecimal("13.6")).build(),
                 Order.builder().side(Side.SELL).symbol(ethereum).quantity(new BigDecimal("50.5")).price(new BigDecimal("14")).build(),
                 Order.builder().side(Side.SELL).symbol(ethereum).quantity(new BigDecimal("441.8")).price(new BigDecimal("13.9")).build(),
-                Order.builder().side(Side.SELL).symbol(ethereum).quantity(new BigDecimal("3.5")).price(new BigDecimal("13.6")).build(),
+
 
                 //buy ethereum
                 Order.builder().side(Side.BUY).symbol(ethereum).quantity(new BigDecimal("10.5")).price(new BigDecimal("14.1")).build(),
@@ -45,6 +45,7 @@ public class CryptoBoardIntegrationTest {
 
         ).forEach(cryptoBoard::placeOrder);
 
+        long orderId_toBeRemoved = cryptoBoard.placeOrder(Order.builder().side(Side.SELL).symbol(ethereum).quantity(new BigDecimal("3.5")).price(new BigDecimal("13.6")).build());
 
         //when
         BoardSummary boardSummary = cryptoBoard.getBoardSummary();
@@ -87,6 +88,25 @@ public class CryptoBoardIntegrationTest {
                         Level.builder().quantity(new BigDecimal("10.22")).price(new BigDecimal("44.7")).build(),
                         Level.builder().quantity(new BigDecimal("55.67")).price(new BigDecimal("44.1")).build()
                 );
+
+        { // REMOVE ORDER TEST
+
+            //given
+            cryptoBoard.removeOrder(orderId_toBeRemoved);
+
+            //when
+            boardSummary = cryptoBoard.getBoardSummary();
+
+            //then
+            assertThat(boardSummary.getSellOrders().get(new Symbol("ETHEREUM")))
+                    .isNotNull()
+                    .containsExactly(
+                            Level.builder().quantity(new BigDecimal("350.1")).price(new BigDecimal("13.6")).build(),
+                            Level.builder().quantity(new BigDecimal("441.8")).price(new BigDecimal("13.9")).build(),
+                            Level.builder().quantity(new BigDecimal("50.5")).price(new BigDecimal("14")).build()
+                    );
+
+        }
     }
 
 }
