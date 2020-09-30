@@ -45,3 +45,15 @@
 - Implemented order removal logic, made the integration test **PASS**
 ---
 - Added integration test for threaded calls
+---
+- Changed the index maps to accept concurrent modifications and improved the threaded integration test assertions
+- My idea to implement concurrency is to execute updates on specific threads like this
+```
+     SYMBOL_1                    SYMBOL_2                                     SYMBOL_N        
+ BUY        SELL             BUY        SELL                              BUY          SELL    
+  |            |              |            |                               |            |    
+  |            |              |            |            ...                |            |    
+  |            |              |            |                               |            |    
+  V            V              V            V                               V            V    
+thread       thread         thread       thread                          thread       thread                                                             
+```

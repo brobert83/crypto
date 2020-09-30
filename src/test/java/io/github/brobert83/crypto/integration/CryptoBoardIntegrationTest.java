@@ -131,13 +131,17 @@ public class CryptoBoardIntegrationTest {
         Supplier<Side> randomSide = () -> random.nextInt(2) % 2 == 0 ? Side.SELL : Side.BUY;
         Supplier<Symbol> randomSymbol = () -> random.nextInt(2) % 2 == 0 ? ethereum : litecoin;
 
+        List<BigDecimal> prices = IntStream.rangeClosed(1, 10).mapToObj(i -> BigDecimal.valueOf(Math.random()).add(BigDecimal.ONE)).collect(Collectors.toList());
+
+        Supplier<BigDecimal> randomPrice = () -> prices.get(random.nextInt(10));
+
         CryptoBoard threadedCallBoard = new CryptoBoard(new OrderBooks(), new OrdersIndex());
 
         Function<Integer, Order> orderBuilder = index -> Order.builder()
                 .side(randomSide.get())
                 .symbol(randomSymbol.get())
                 .quantity(BigDecimal.valueOf(Math.random()).add(BigDecimal.ONE))
-                .price(BigDecimal.valueOf(Math.random()).add(BigDecimal.ONE))
+                .price(randomPrice.get())
                 .build();
 
         List<Runnable> commands = IntStream.rangeClosed(1, 1000)
@@ -154,7 +158,15 @@ public class CryptoBoardIntegrationTest {
         BoardSummary boardSummary = cryptoBoard.getBoardSummary();
         BoardSummary threadedBoard_Summary = threadedCallBoard.getBoardSummary();
 
-        assertThat(threadedBoard_Summary).isEqualToComparingFieldByField(boardSummary);
+        threadedBoard_Summary.getBuyOrders()
+                .forEach((symbol, levels) ->
+                        assertThat(levels)
+                                .containsExactly(boardSummary.getBuyOrders().get(symbol).toArray(new Level[0])));
+
+        threadedBoard_Summary.getSellOrders()
+                .forEach((symbol, levels) ->
+                        assertThat(levels)
+                                .containsExactly(boardSummary.getSellOrders().get(symbol).toArray(new Level[0])));
     }
 
 }

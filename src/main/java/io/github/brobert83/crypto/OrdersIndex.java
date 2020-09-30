@@ -1,11 +1,10 @@
 package io.github.brobert83.crypto;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class OrdersIndex {
 
-    private final Map<Long, OrderBook> index = new HashMap<>();
+    private final ConcurrentHashMap<Long, OrderBook> index = new ConcurrentHashMap<>();
 
     public void add(long orderId, OrderBook orderBook) {
         index.put(orderId, orderBook);

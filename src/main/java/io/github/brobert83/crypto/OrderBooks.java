@@ -5,12 +5,11 @@ import io.github.brobert83.crypto.model.Symbol;
 import lombok.NonNull;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class OrderBooks {
 
-    private final Map<Symbol, OrderBook> orderBooks = new HashMap<>();
+    private final ConcurrentHashMap<Symbol, OrderBook> orderBooks = new ConcurrentHashMap<>();
 
     public OrderBook getOrderBookForSymbol(@NonNull Symbol symbol) {
         return orderBooks.computeIfAbsent(symbol, s -> OrderBook.builder().symbol(s).build());
