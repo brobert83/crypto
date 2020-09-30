@@ -1,6 +1,7 @@
 package io.github.brobert83.crypto;
 
 
+import io.github.brobert83.crypto.model.BoardSummary;
 import io.github.brobert83.crypto.model.Order;
 import io.github.brobert83.crypto.model.Symbol;
 import org.junit.Before;
@@ -22,6 +23,7 @@ public class CryptoBoardTest {
     @Mock OrderBooks orderBooks;
     @Mock OrderBook orderBook;
     @Mock Symbol symbol;
+    @Mock BoardSummary boardSummary;
 
     @Before
     public void setUp() {
@@ -43,6 +45,19 @@ public class CryptoBoardTest {
         //then
         assertThat(orderId).isEqualTo(1234L);
         verify(orderBook).addOrder(order);
+    }
+
+    @Test
+    public void getBoardSummary(){
+
+        //given
+        when(orderBooks.getBoardSummary()).thenReturn(boardSummary);
+
+        //when
+        BoardSummary actualBoardSummary = cryptoBoard.getBoardSummary();
+
+        //then
+        assertThat(actualBoardSummary).isEqualTo(boardSummary);
     }
 
 }

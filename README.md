@@ -37,3 +37,5 @@
 ---
 - Implemented the order place logic
 - Used TreeSet to maintain the order and perform easy search
+---
+- Added the board summary logic, made the integration test **PASS**

@@ -47,7 +47,7 @@ public class CryptoBoardIntegrationTest {
 
 
         //when
-        BoardSummary boardSummary = cryptoBoard.getSummary();
+        BoardSummary boardSummary = cryptoBoard.getBoardSummary();
 
         //then
         assertThat(boardSummary).isNotNull();
@@ -71,14 +71,14 @@ public class CryptoBoardIntegrationTest {
                 .isNotNull()
                 .containsExactly(
                         Level.builder().quantity(new BigDecimal("111.5")).price(new BigDecimal("15.8")).build(),
-                        Level.builder().quantity(new BigDecimal("23")).price(new BigDecimal("14.1")).build()
+                        Level.builder().quantity(new BigDecimal("23.0")).price(new BigDecimal("14.1")).build()
                 );
 
         assertThat(boardSummary.getSellOrders().get(new Symbol("litecoin")))
                 .isNotNull()
                 .containsExactly(
                         Level.builder().quantity(new BigDecimal("45.56245")).price(new BigDecimal("111.6")).build(),
-                        Level.builder().quantity(new BigDecimal("567.3234")).price(new BigDecimal("123.567")).build()
+                        Level.builder().quantity(new BigDecimal("1134.3234")).price(new BigDecimal("123.567")).build()
                 );
 
         assertThat(boardSummary.getBuyOrders().get(new Symbol("Litecoin")))

@@ -13,6 +13,4 @@ public class BoardSummary {
     @Getter private final Map<Symbol, List<Level>> sellOrders = new HashMap<>();
     @Getter private final Map<Symbol, List<Level>> buyOrders = new HashMap<>();
 
-    private Side side;
-
 }

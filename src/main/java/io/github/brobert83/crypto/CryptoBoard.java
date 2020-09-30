@@ -18,8 +18,8 @@ public class CryptoBoard {
         return orderBook.addOrder(order);
     }
 
-    public BoardSummary getSummary() {
-        return null;
+    public BoardSummary getBoardSummary() {
+        return orderBooks.getBoardSummary();
     }
 
 }
