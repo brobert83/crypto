@@ -3,10 +3,10 @@
 - The specification is [here](docs/Crypto_v1.0.md).
 - Java 8 will be used
 - The solution will be written using a ATDD approach.
-- I have keep a journal as I wrote the code, it is [here](docs/CommitJournal.md)
+- I have kept a journal as I wrote the code, it is [here](docs/CommitJournal.md)
 
 ## Design Decisions
-- The example in the spec for the summary is only for one symbol and it does not specify a particular structure,so I decided to make it so that the summary will contain data about all the symbols and both sell and buy sides, see [Code section](#Code)
+- The example in the spec for the summary is only for one symbol and it does not specify a particular structure, so I decided to make it so that the summary will contain data about all the symbols and both sell and buy sides, see [Code section](#Code)
 - The first version will be single threaded, after that works I will add multi-threading (because a UI is mentioned I assume this code should be threadsafe)
 - I won't make too many performance enhancements initially, the first version will focus on the functional requirements.
 - The code is not written in a protective style, there are null checks added using Lombok's @NonNull annotation
