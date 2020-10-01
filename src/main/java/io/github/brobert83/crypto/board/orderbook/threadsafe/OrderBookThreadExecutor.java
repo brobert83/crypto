@@ -1,6 +1,7 @@
-package io.github.brobert83.crypto;
+package io.github.brobert83.crypto.board.orderbook.threadsafe;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -8,11 +9,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 @AllArgsConstructor
-public class OrderExecutor {
+public class OrderBookThreadExecutor {
 
     private final ExecutorService executorService;
 
-    public <T> T execute(Callable<T> command) {
+    public <T> T execute(@NonNull Callable<T> command) {
 
         Future<T> task = executorService.submit(command);
 
@@ -26,7 +27,7 @@ public class OrderExecutor {
         }
     }
 
-    public void execute(Runnable command) {
+    public void execute(@NonNull Runnable command) {
 
         Future<?> task = executorService.submit(command);
 

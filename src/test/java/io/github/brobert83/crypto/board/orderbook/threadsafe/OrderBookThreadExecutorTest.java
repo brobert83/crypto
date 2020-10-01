@@ -1,4 +1,4 @@
-package io.github.brobert83.crypto;
+package io.github.brobert83.crypto.board.orderbook.threadsafe;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,9 +15,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class OrderExecutorTest {
+public class OrderBookThreadExecutorTest {
 
-    OrderExecutor orderExecutor;
+    OrderBookThreadExecutor orderBookThreadExecutor;
 
     @Mock ExecutorService executorService;
     @Mock Callable<Long> callable;
@@ -27,7 +27,7 @@ public class OrderExecutorTest {
 
     @Before
     public void setUp() {
-         orderExecutor = new OrderExecutor(executorService);
+         orderBookThreadExecutor = new OrderBookThreadExecutor(executorService);
     }
 
     @Test
@@ -38,7 +38,7 @@ public class OrderExecutorTest {
         when(taskCallable.get()).thenReturn(111L);
 
         //when
-        long result = orderExecutor.execute(callable);
+        long result = orderBookThreadExecutor.execute(callable);
 
         //then
         verify(executorService).submit(callable);
@@ -53,7 +53,7 @@ public class OrderExecutorTest {
         when(executorService.submit(runnable)).thenReturn(taskRunnable);
 
         //when
-        orderExecutor.execute(runnable);
+        orderBookThreadExecutor.execute(runnable);
 
         //then
         verify(executorService).submit(runnable);

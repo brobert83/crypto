@@ -1,4 +1,4 @@
-package io.github.brobert83.crypto.model;
+package io.github.brobert83.crypto.board.model;
 
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;

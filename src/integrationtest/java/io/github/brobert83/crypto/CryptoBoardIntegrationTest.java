@@ -1,28 +1,17 @@
-package io.github.brobert83.crypto.integration;
+package io.github.brobert83.crypto;
 
-import io.github.brobert83.crypto.CryptoBoard;
-import io.github.brobert83.crypto.OrderBooks;
-import io.github.brobert83.crypto.OrdersIndex;
-import io.github.brobert83.crypto.model.*;
+import io.github.brobert83.crypto.board.CryptoBoard;
+import io.github.brobert83.crypto.board.model.*;
 import org.junit.Test;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CryptoBoardIntegrationTest {
 
-    CryptoBoard cryptoBoard = new CryptoBoard(new OrderBooks(), new OrdersIndex());
+    CryptoBoard cryptoBoard = CryptoBoardApi.newCryptoBoard();
 
     @Test
     public void summary() {
@@ -37,7 +26,6 @@ public class CryptoBoardIntegrationTest {
                 Order.builder().side(Side.SELL).symbol(ethereum).quantity(new BigDecimal("50.5")).price(new BigDecimal("14")).build(),
                 Order.builder().side(Side.SELL).symbol(ethereum).quantity(new BigDecimal("441.8")).price(new BigDecimal("13.9")).build(),
 
-
                 //buy ethereum
                 Order.builder().side(Side.BUY).symbol(ethereum).quantity(new BigDecimal("10.5")).price(new BigDecimal("14.1")).build(),
                 Order.builder().side(Side.BUY).symbol(ethereum).quantity(new BigDecimal("12.5")).price(new BigDecimal("14.1")).build(),
@@ -51,9 +39,9 @@ public class CryptoBoardIntegrationTest {
                 //buy litecoin
                 Order.builder().side(Side.BUY).symbol(litecoin).quantity(new BigDecimal("55.67")).price(new BigDecimal("44.1")).build(),
                 Order.builder().side(Side.BUY).symbol(litecoin).quantity(new BigDecimal("10.22")).price(new BigDecimal("44.7")).build()
-        ).forEach(cryptoBoard::placeOrder);
+        ).forEach(cryptoBoard::addOrder);
 
-        long orderId_toBeRemoved = cryptoBoard.placeOrder(Order.builder().side(Side.SELL).symbol(ethereum).quantity(new BigDecimal("3.5")).price(new BigDecimal("13.6")).build());
+        long orderId_toBeRemoved = cryptoBoard.addOrder(Order.builder().side(Side.SELL).symbol(ethereum).quantity(new BigDecimal("3.5")).price(new BigDecimal("13.6")).build()).getId();
 
         //when
         BoardSummary boardSummary = cryptoBoard.getBoardSummary();
@@ -61,14 +49,14 @@ public class CryptoBoardIntegrationTest {
         //then
         assertThat(boardSummary).isNotNull();
 
-        assertThat(boardSummary.getSellOrders()).isNotNull();
-        assertThat(boardSummary.getBuyOrders()).isNotNull();
+        assertThat(boardSummary.getSellLevels()).isNotNull();
+        assertThat(boardSummary.getBuyLevels()).isNotNull();
 
-        assertThat(boardSummary.getSellOrders())
+        assertThat(boardSummary.getSellLevels())
                 .isNotNull()
                 .containsKeys(new Symbol("ethereum"), new Symbol("LITECOIN"));
 
-        assertThat(boardSummary.getSellOrders().get(new Symbol("ETHEREUM")))
+        assertThat(boardSummary.getSellLevels().get(new Symbol("ETHEREUM")))
                 .isNotNull()
                 .containsExactly(
                         Level.builder().quantity(new BigDecimal("353.6")).price(new BigDecimal("13.6")).build(),
@@ -76,21 +64,21 @@ public class CryptoBoardIntegrationTest {
                         Level.builder().quantity(new BigDecimal("50.5")).price(new BigDecimal("14")).build()
                 );
 
-        assertThat(boardSummary.getBuyOrders().get(new Symbol("Ethereum")))
+        assertThat(boardSummary.getBuyLevels().get(new Symbol("Ethereum")))
                 .isNotNull()
                 .containsExactly(
                         Level.builder().quantity(new BigDecimal("111.5")).price(new BigDecimal("15.8")).build(),
                         Level.builder().quantity(new BigDecimal("23.0")).price(new BigDecimal("14.1")).build()
                 );
 
-        assertThat(boardSummary.getSellOrders().get(new Symbol("litecoin")))
+        assertThat(boardSummary.getSellLevels().get(new Symbol("litecoin")))
                 .isNotNull()
                 .containsExactly(
                         Level.builder().quantity(new BigDecimal("45.56245")).price(new BigDecimal("111.6")).build(),
                         Level.builder().quantity(new BigDecimal("1134.3234")).price(new BigDecimal("123.567")).build()
                 );
 
-        assertThat(boardSummary.getBuyOrders().get(new Symbol("Litecoin")))
+        assertThat(boardSummary.getBuyLevels().get(new Symbol("Litecoin")))
                 .isNotNull()
                 .containsExactly(
                         Level.builder().quantity(new BigDecimal("10.22")).price(new BigDecimal("44.7")).build(),
@@ -106,7 +94,7 @@ public class CryptoBoardIntegrationTest {
             boardSummary = cryptoBoard.getBoardSummary();
 
             //then
-            assertThat(boardSummary.getSellOrders().get(new Symbol("ETHEREUM")))
+            assertThat(boardSummary.getSellLevels().get(new Symbol("ETHEREUM")))
                     .isNotNull()
                     .containsExactly(
                             Level.builder().quantity(new BigDecimal("350.1")).price(new BigDecimal("13.6")).build(),
@@ -115,64 +103,6 @@ public class CryptoBoardIntegrationTest {
                     );
 
         }
-    }
-
-    // This test will build a board in single threaded mode than a second board  multi-threaded and compare them
-    @Test
-    public void summaryThreadSafe() throws InterruptedException {
-
-        //given
-        Symbol ethereum = new Symbol("Ethereum");
-        Symbol litecoin = new Symbol("Litecoin");
-
-        Random random = new Random();
-
-        Supplier<Side> randomSide = () -> random.nextInt(2) % 2 == 0 ? Side.SELL : Side.BUY;
-        Supplier<Symbol> randomSymbol = () -> random.nextInt(2) % 2 == 0 ? ethereum : litecoin;
-
-        List<BigDecimal> prices = IntStream.rangeClosed(1, 10).mapToObj(i -> BigDecimal.valueOf(Math.random()).add(BigDecimal.ONE)).collect(Collectors.toList());
-
-        Supplier<BigDecimal> randomPrice = () -> prices.get(random.nextInt(10));
-
-        CryptoBoard threadedCallBoard = new CryptoBoard(new OrderBooks(), new OrdersIndex());
-
-        Function<Integer, Order> orderBuilder = index -> Order.builder()
-                .side(randomSide.get())
-                .symbol(randomSymbol.get())
-                .quantity(BigDecimal.valueOf(Math.random()).add(BigDecimal.ONE))
-                .price(randomPrice.get())
-                .build();
-
-        // these are the orders used to build both books
-        List<Order> orders = IntStream.rangeClosed(1, 1000)
-                .mapToObj(orderBuilder::apply)
-                .collect(Collectors.toList());
-
-        List<Runnable> commands = orders.stream()
-                .peek(order -> cryptoBoard.placeOrder(order))
-                .map(order -> (Runnable) () -> threadedCallBoard.placeOrder(order))
-                .collect(Collectors.toList());
-
-        ExecutorService executorService = Executors.newFixedThreadPool(15);
-
-        commands.parallelStream().forEach(executorService::submit);
-        executorService.shutdown();
-        executorService.awaitTermination(100, TimeUnit.SECONDS);
-
-        BoardSummary boardSummary = cryptoBoard.getBoardSummary();
-        BoardSummary threadedBoard_Summary = threadedCallBoard.getBoardSummary();
-
-        threadedBoard_Summary.getBuyOrders()
-                .forEach((symbol, levels) ->
-                        assertThat(levels)
-                                .describedAs("buy orders for " + symbol)
-                                .containsExactly(boardSummary.getBuyOrders().get(symbol).toArray(new Level[0])));
-
-        threadedBoard_Summary.getSellOrders()
-                .forEach((symbol, levels) ->
-                        assertThat(levels)
-                                .describedAs("sell orders for " + symbol)
-                                .containsExactly(boardSummary.getSellOrders().get(symbol).toArray(new Level[0])));
     }
 
 }
