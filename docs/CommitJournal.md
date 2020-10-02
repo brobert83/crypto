@@ -69,3 +69,6 @@
 - Added usage notes in the README
 - Added small performance improvements (initialized some maps with initial capacity to prevent premature rehashing)
 - Added javadoc in some places
+---
+- I realized that I completely missed the requirement for a specific amount of elements be present in the board summary 
+- Fixed so that that the board summary returns a specific amount of levels
