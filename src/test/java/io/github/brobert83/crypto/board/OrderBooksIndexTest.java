@@ -10,7 +10,9 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.TreeSet;
 import java.util.function.Function;
 
@@ -106,7 +108,7 @@ public class OrderBooksIndexTest {
                 }});
 
         //when
-        BoardSummary boardSummary = orderBooksIndex.getBoardSummary();
+        BoardSummary boardSummary = orderBooksIndex.getBoardSummary(4);
 
         //then
         assertThat(boardSummary.getSellLevels().get(new Symbol("lite")))
@@ -120,6 +122,21 @@ public class OrderBooksIndexTest {
 
         assertThat(boardSummary.getBuyLevels().get(new Symbol("heavy")))
                 .containsExactly(heavy_buyLevel1, heavy_buyLevel2);
+    }
+
+    @Test
+    public void getFirstElements() {
+
+        //given
+        List<Integer> collection = Arrays.asList(1, 2, 3, 4, 5, 6);
+
+        //when
+        List<Integer> firstElements = orderBooksIndex.getFirstElements(collection, 3);
+
+        //then
+        assertThat(firstElements)
+                .hasSize(3)
+                .containsExactly(1, 2, 3);
     }
 
 }

@@ -55,7 +55,7 @@ To use this code as a library:
     cryptoBoard.removeOrder(12345L);
 
     //get summary
-    BoardSummary summary = cryptoBoard.getBoardSummary();
+    BoardSummary summary = cryptoBoard.getBoardSummary(10);
 
     //to get the sell levels for a symbol from the summary
     List<Level> ethereumSellLevels = summary.getSellLevels().get(new Symbol("ETHEREUM"));

@@ -83,10 +83,10 @@ public class CryptoBoardTest {
     public void getBoardSummary() {
 
         //given
-        when(orderBooksIndex.getBoardSummary()).thenReturn(boardSummary);
+        when(orderBooksIndex.getBoardSummary(10)).thenReturn(boardSummary);
 
         //when
-        BoardSummary actualBoardSummary = cryptoBoard.getBoardSummary();
+        BoardSummary actualBoardSummary = cryptoBoard.getBoardSummary(10);
 
         //then
         assertThat(actualBoardSummary).isSameAs(boardSummary);

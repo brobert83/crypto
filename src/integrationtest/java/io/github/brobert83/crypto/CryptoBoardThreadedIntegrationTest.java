@@ -49,8 +49,9 @@ public class CryptoBoardThreadedIntegrationTest {
                 .price(randomPrice.get())
                 .build();
 
+        int orderCount = 1000;
         // these are the orders used to build both boards
-        List<Order> orders = IntStream.rangeClosed(1, 1000)
+        List<Order> orders = IntStream.rangeClosed(1, orderCount)
                 .mapToObj(orderBuilder::apply)
                 .collect(Collectors.toList());
 
@@ -65,8 +66,8 @@ public class CryptoBoardThreadedIntegrationTest {
         executorService.shutdown();
         executorService.awaitTermination(100, TimeUnit.SECONDS);
 
-        BoardSummary boardSummary = cryptoBoard.getBoardSummary();
-        BoardSummary threadedBoard_Summary = cryptoBoardThreaded.getBoardSummary();
+        BoardSummary boardSummary = cryptoBoard.getBoardSummary(orderCount);
+        BoardSummary threadedBoard_Summary = cryptoBoardThreaded.getBoardSummary(orderCount);
 
         threadedBoard_Summary.getBuyLevels()
                 .forEach((symbol, levels) ->

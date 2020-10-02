@@ -51,9 +51,10 @@ public class CryptoBoard {
 
     /**
      * Returns the summary of all the orders for all the symbols present in the system.
+     * @param count, how many of the top levels should the summary contain
      */
-    public BoardSummary getBoardSummary() {
-        return orderBooksIndex.getBoardSummary();
+    public BoardSummary getBoardSummary(int count) {
+        return orderBooksIndex.getBoardSummary(count);
     }
 
 }

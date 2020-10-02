@@ -5,6 +5,7 @@ import io.github.brobert83.crypto.board.model.*;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.util.stream.IntStream;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,7 +45,7 @@ public class CryptoBoardIntegrationTest {
         long orderId_toBeRemoved = cryptoBoard.addOrder(Order.builder().side(Side.SELL).symbol(ethereum).quantity(new BigDecimal("3.5")).price(new BigDecimal("13.6")).build()).getId();
 
         //when
-        BoardSummary boardSummary = cryptoBoard.getBoardSummary();
+        BoardSummary boardSummary = cryptoBoard.getBoardSummary(10);
 
         //then
         assertThat(boardSummary).isNotNull();
@@ -91,7 +92,7 @@ public class CryptoBoardIntegrationTest {
             cryptoBoard.removeOrder(orderId_toBeRemoved);
 
             //when
-            boardSummary = cryptoBoard.getBoardSummary();
+            boardSummary = cryptoBoard.getBoardSummary(10);
 
             //then
             assertThat(boardSummary.getSellLevels().get(new Symbol("ETHEREUM")))
@@ -103,6 +104,41 @@ public class CryptoBoardIntegrationTest {
                     );
 
         }
+    }
+
+    interface OrderGenerator {
+        Order newOrder(Side side, Integer seed, Symbol symbol);
+    }
+
+    OrderGenerator orderGenerator = (side, seed, symbol) -> Order.builder().side(side).symbol(symbol).quantity(new BigDecimal("" + seed)).price(new BigDecimal("" + (seed * 1.12))).build();
+
+    @Test
+    public void summary_top10() {
+
+        //given
+        Symbol ethereum = new Symbol("Ethereum");
+        Symbol litecoin = new Symbol("Litecoin");
+        Symbol bitcoin = new Symbol("Bitcoin");
+
+        IntStream.rangeClosed(1, 15).mapToObj(index -> orderGenerator.newOrder(Side.SELL, index, ethereum)).forEach(cryptoBoard::addOrder);
+        IntStream.rangeClosed(1, 15).mapToObj(index -> orderGenerator.newOrder(Side.BUY, index, ethereum)).forEach(cryptoBoard::addOrder);
+
+        IntStream.rangeClosed(1, 15).mapToObj(index -> orderGenerator.newOrder(Side.SELL, index, litecoin)).forEach(cryptoBoard::addOrder);
+        IntStream.rangeClosed(1, 15).mapToObj(index -> orderGenerator.newOrder(Side.BUY, index, litecoin)).forEach(cryptoBoard::addOrder);
+
+        IntStream.rangeClosed(1, 7).mapToObj(index -> orderGenerator.newOrder(Side.SELL, index, bitcoin)).forEach(cryptoBoard::addOrder);
+        IntStream.rangeClosed(1, 10).mapToObj(index -> orderGenerator.newOrder(Side.BUY, index, bitcoin)).forEach(cryptoBoard::addOrder);
+
+        //when
+        BoardSummary boardSummary = cryptoBoard.getBoardSummary(10);
+
+        //then
+        assertThat(boardSummary.getSellLevels().get(ethereum)).hasSize(10);
+        assertThat(boardSummary.getBuyLevels().get(ethereum)).hasSize(10);
+        assertThat(boardSummary.getSellLevels().get(litecoin)).hasSize(10);
+        assertThat(boardSummary.getBuyLevels().get(litecoin)).hasSize(10);
+        assertThat(boardSummary.getSellLevels().get(bitcoin)).hasSize(7);
+        assertThat(boardSummary.getBuyLevels().get(bitcoin)).hasSize(10);
     }
 
 }
