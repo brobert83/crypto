@@ -1,8 +1,8 @@
 # General notes
 
 - The specification is [here](docs/Crypto_v1.0.md).
-- Java 8 will be used
-- The solution will be written using a ATDD approach.
+- Java 8 is used
+- The solution is written using a ATDD + TDD approach.
 - I have kept a journal as I wrote the code, it is [here](docs/CommitJournal.md)
 
 ## Design Decisions
